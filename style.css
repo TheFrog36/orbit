@@ -1,0 +1,23 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    background-color: #222;
+    overflow: hidden;
+}
+
+#main-container{
+    height: 100%;
+    display: grid;
+    place-content: center;
+}
+
+#canvas-container{
+    width: 600px;
+    height: 600px;
+    outline: 1px solid cyan;
+}
