@@ -5,45 +5,53 @@ const canvasHeight = canvasWidth
 const orbitingPoint = {
     x: canvasWidth / 2,
     y: canvasHeight / 2,
-    m: 1000
+    m: 1
 }
-const g = 50
+const g = 20000
 const points =[]
-const nPoints = 1000
-const maxSecondsOutside = 300
+const nPoints = 10000
+const maxSecondsOutside = 100
 
 const minMaxRadius = [5,30]
 const minMaxX = [0, canvasWidth]
-const minMaxY = [0, 0]
-const minMaxSpeedX = [6, 6]
-const minMaxSpeedY = [0, 0]
-const minMaxMass = [2000, 2000]
+const minMaxY = [0, canvasHeight]
+const minMaxSpeedX = [-10, 10]
+const minMaxSpeedY = [-10, 10]
+const minMaxMass = [1, 1]
 
 const minMaxHue = [0, 365]
-const minMaxSaturation = [80, 80]
-const minMaxLightness = [50, 50]
+const minMaxSaturation = [60, 80]
+const minMaxLightness = [45, 60]
 
 const inside = document.getElementById("inside")
 const rendered = document.getElementById("rendered")
 
 for(let i = 0; i < nPoints; i++){
     // const hue = Math.round(Math.random() * (minMaxHue[1] - minMaxHue[0]) + minMaxHue[0])
-    const hue = 365 / nPoints * i
-    const saturation = Math.round(Math.random() * (minMaxSaturation[1] - minMaxSaturation[0]) + minMaxSaturation[0])
-    const lightness = Math.round(Math.random() * (minMaxLightness[1] - minMaxLightness[0]) + minMaxLightness[0])
+    // const saturation = Math.round(Math.random() * (minMaxSaturation[1] - minMaxSaturation[0]) + minMaxSaturation[0])
+    // const lightness = Math.round(Math.random() * (minMaxLightness[1] - minMaxLightness[0]) + minMaxLightness[0])
+    // const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+    // points.push({
+    //     x: Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0],
+    //     y: Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0],
+    //     r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
+    //     m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
+    //     speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
+    //     speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
+    //     framesOutside: 0,
+    //     color: hueString
+    // })
+
+    const hue = 0
+    const saturation = 0
+    const lightness = 100 / nPoints * i
     const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
     points.push({
-        // x: Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0],
-        x: canvasWidth / nPoints * i - canvasWidth,
-        // y: Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0],
+        x: canvasWidth / nPoints * i,
         y: 0,
-        // r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
-        r: 40 / nPoints * i + 1,
-        // m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
-        m: 2000,
-        // speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
-        speedX: 6,
-        // speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
+        r: 30 / nPoints * i,
+        m: 1,
+        speedX: 5,
         speedY: 0,
         framesOutside: 0,
         color: hueString
@@ -90,10 +98,10 @@ function gameLoop() {
 }
 
 function render(lagOffset) {
-    ctx.fillStyle="black"
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle="white"
-    ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
+    // ctx.fillStyle="black"
+    // ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    // ctx.fillStyle="white"
+    // ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
     for(const point of points){
         ctx.beginPath()
         ctx.fillStyle=point.color
