@@ -115,21 +115,21 @@ function update(){
     for(let i = 0; i < points.length; i++){
         const point = points[i]
         onewayGravitationalAcceleration(point)
-        if(isOutside(point)){
-            if(point.framesOutside > maxFramesOutside){
-                points.splice(i, 1)
-            }
-        } else {
-            pointsOnScreen++
-        }
+        // if(isOutside(point)){
+        //     if(point.framesOutside > maxFramesOutside){
+        //         points.splice(i, 1)
+        //     }
+        // } else {
+        //     pointsOnScreen++
+        // }
     }
     let collided = false
-    for(let i = 0; i < points.length-1; i++){
-        for(let j = i+1; j < points.length; j++){
-            const res = handleCollision(points[i], points[j])
-            if(res) collided = true
-        }
-    }
+    // for(let i = 0; i < points.length-1; i++){
+    //     for(let j = i+1; j < points.length; j++){
+    //         const res = handleCollision(points[i], points[j])
+    //         if(res) collided = true
+    //     }
+    // }
     canvasContainer.style.outlineColor = collided ? "red" : "cyan"
     
 } 
