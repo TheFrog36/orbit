@@ -1,20 +1,51 @@
 "use strict";
 
-const canvasWidth = 600
+const canvasWidth = 1000
 const canvasHeight = canvasWidth
 const orbitingPoint = {
     x: canvasWidth / 2,
-    y: canvasWidth / 2,
-    m: 10000
+    y: canvasHeight / 2,
+    m: 1000
 }
+const g = 60
+const points =[]
+const nPoints = 200
+const maxSecondsOutside = 100
 
-const subject = {
-    x: 10, 
-    y: 10,
-    speedX: 10,
-    speedY: 0,
-    m: 10
-}
+const minMaxRadius = [5,30]
+const minMaxX = [0, canvasWidth]
+const minMaxY = [0, 0]
+const minMaxSpeedX = [6, 6]
+const minMaxSpeedY = [0, 0]
+const minMaxMass = [2000, 2000]
+
+const minMaxHue = [0, 365]
+const minMaxSaturation = [80, 80]
+const minMaxLightness = [50, 50]
+
+for(let i = 0; i < nPoints; i++){
+    // const hue = Math.round(Math.random() * (minMaxHue[1] - minMaxHue[0]) + minMaxHue[0])
+    const hue = 365 / nPoints * i
+    const saturation = Math.round(Math.random() * (minMaxSaturation[1] - minMaxSaturation[0]) + minMaxSaturation[0])
+    const lightness = Math.round(Math.random() * (minMaxLightness[1] - minMaxLightness[0]) + minMaxLightness[0])
+    const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+    points.push({
+        // x: Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0],
+        x: canvasWidth / nPoints * i,
+        // y: Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0],
+        y: 0,
+        // r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
+        r: 40 / nPoints * i + 1,
+        // m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
+        m: 2000,
+        // speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
+        speedX: 5,
+        // speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
+        speedY: 0,
+        framesOutside: 0,
+        color: hueString
+    })
+}  
 
 const canvas = document.getElementById("canvas")
 canvas.width = canvasWidth
@@ -23,14 +54,15 @@ const ctx = canvas.getContext("2d")
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+ctx.fillStyle="white"
+    ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
+
 
 var fps = 60,
-    //Get the start time
     start = Date.now(),
-    //Set the frame duration in milliseconds
     frameDuration = 1000 / fps,
-    //Initialize the lag offset
     lag = 0;
+    const maxFramesOutside = fps * maxSecondsOutside
 
     gameLoop();
 
@@ -43,9 +75,6 @@ function gameLoop() {
     start = current;
     //Add the elapsed time to the lag counter
     lag += elapsed;
-
-    //Update the frame if the lag counter is greater than or
-    //equal to the frame duration
     while (lag >= frameDuration){  
         //Update the logic
         update();
@@ -60,8 +89,16 @@ function gameLoop() {
 function render(lagOffset) {
     ctx.fillStyle="black"
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle="red"
-    ctx.fillRect(subject.x, subject.y, 2, 2)
+    ctx.fillStyle="white"
+    ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
+    for(const point of points){
+        ctx.beginPath()
+        ctx.fillStyle=point.color
+        ctx.arc(point.x, point.y, point.r, 0, 360)
+        ctx.fill();
+        ctx.fillRect(point.x, point.y, 2, 2)
+        ctx.closePath()
+    }
     // sprites.forEach(function(sprite){
     //   ctx.save();
     //   //Call the sprite's `render` method and feed it the
@@ -72,29 +109,60 @@ function render(lagOffset) {
 }
 
 function update(){
-    subject.x++
+    const canvasContainer = document.getElementById("canvas-container")
+    // subject.x++
+    let pointsOnScreen = 0
+    for(let i = 0; i < points.length; i++){
+        const point = points[i]
+        onewayGravitationalAcceleration(point)
+        if(isOutside(point)){
+            if(point.framesOutside > maxFramesOutside){
+                points.splice(i, 1)
+            }
+        } else {
+            pointsOnScreen++
+        }
+    }
+    let collided = false
+    for(let i = 0; i < points.length-1; i++){
+        for(let j = i+1; j < points.length; j++){
+            const res = handleCollision(points[i], points[j])
+            if(res) collided = true
+        }
+    }
+    canvasContainer.style.outlineColor = collided ? "red" : "cyan"
+    
 } 
 
-// F = G * ( m1 * m2 / r**2)
+function isOutside(point){
+    const outside = point.x < 0 || point.x > canvasWidth || point.y < 0 || point.x > canvasHeight
+    if(!outside) {
+        point.framesOutside = 0
+        return false
+    }
+    point.framesOutside++
+    return true
+}
 
-/*
+function onewayGravitationalAcceleration(planet){
+    const distance = Math.sqrt((planet.x - orbitingPoint.x)**2 + (planet.y - orbitingPoint.y)**2)
+    const force = (planet.m * orbitingPoint.m) / (distance ** 2) * g
+    const angle = Math.atan2( orbitingPoint.y - planet.y, orbitingPoint.x - planet.x )
+    const acceleration = force / planet.m
+    const accX = acceleration * Math.cos(angle)
+    const accY = acceleration * Math.sin(angle)
+    planet.speedX += accX
+    planet.speedY += accY
+    planet.x += planet.speedX
+    planet.y += planet.speedY
+    
+}
 
-https://thepythoncodingbook.com/2021/09/29/simulating-orbiting-planets-in-a-solar-system-using-python-orbiting-planets-series-1/
+function handleCollision(p1, p2){
+    const distance = Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+    const minDistance = p1.r + p2.r
+    if(distance > p1.r + p2.r) return false
+    const angle = Math.atan2( p1.y - p2.y, p1.x - p2.x )
+    return true
+}
 
-def accelerate_due_to_gravity(
-    first: SolarSystemBody,
-    second: SolarSystemBody,
-    ):
-        force = first.mass * second.mass / first.distance(second) ** 2
-        angle = first.towards(second)
-        reverse = 1
-        for body in first, second:
-            acceleration = force / body.mass
-            acc_x = acceleration * math.cos(math.radians(angle))
-            acc_y = acceleration * math.sin(math.radians(angle))
-            body.velocity = (
-                body.velocity[0] + (reverse * acc_x),
-                body.velocity[1] + (reverse * acc_y),
-            )
-            reverse = -1
-*/
