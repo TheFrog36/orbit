@@ -9,7 +9,7 @@ const orbitingPoint = {
 }
 const g = 20000
 const points =[]
-const nPoints = 10000
+const nPoints = 1000
 const maxSecondsOutside = 100
 
 const minMaxRadius = [5,30]
@@ -42,21 +42,24 @@ for(let i = 0; i < nPoints; i++){
     //     color: hueString
     // })
 
-    const hue = 0
-    const saturation = 0
-    const lightness = 100 / nPoints * i
+    const hue = 180 + 100 / nPoints * i
+    const saturation = 50
+    const lightness = 50
     const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
     points.push({
-        x: canvasWidth / nPoints * i,
+        x: 300 / nPoints * i,
         y: 0,
-        r: 30 / nPoints * i,
-        m: 1,
-        speedX: 5,
+        // r: 30 / nPoints * i,
+        r: 5,
+        m: 1 ,
+        speedX: 4 + 1 / nPoints * i,
         speedY: 0,
         framesOutside: 0,
-        color: hueString
+        color: hueString,
+        g: 40000 / nPoints * i + 20000
     })
 }  
+
 
 const canvas = document.getElementById("canvas")
 canvas.width = canvasWidth
@@ -102,7 +105,8 @@ function render(lagOffset) {
     // ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     // ctx.fillStyle="white"
     // ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
-    for(const point of points){
+    for(let i = 0; i < points.length; i++){
+        const point = points[points.length - 1 - i]
         ctx.beginPath()
         ctx.fillStyle=point.color
         ctx.arc(point.x, point.y, point.r, 0, 360)
@@ -118,6 +122,7 @@ function render(lagOffset) {
     //   ctx.restore();
     // });
 }
+
 
 function update(){
     const canvasContainer = document.getElementById("canvas-container")
@@ -158,7 +163,7 @@ function isOutside(point){
 
 function onewayGravitationalAcceleration(planet){
     const distance = Math.sqrt((planet.x - orbitingPoint.x)**2 + (planet.y - orbitingPoint.y)**2)
-    const force = (planet.m * orbitingPoint.m) / (distance ** 2) * g
+    const force = planet.g * ((planet.m * orbitingPoint.m) / (distance ** 2))
     const angle = Math.atan2( orbitingPoint.y - planet.y, orbitingPoint.x - planet.x )
     const acceleration = force / planet.m
     const accX = acceleration * Math.cos(angle)
