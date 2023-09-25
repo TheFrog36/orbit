@@ -7,10 +7,10 @@ const orbitingPoint = {
     y: canvasHeight / 2,
     m: 1000
 }
-const g = 60
+const g = 50
 const points =[]
-const nPoints = 200
-const maxSecondsOutside = 100
+const nPoints = 1000
+const maxSecondsOutside = 300
 
 const minMaxRadius = [5,30]
 const minMaxX = [0, canvasWidth]
@@ -23,6 +23,9 @@ const minMaxHue = [0, 365]
 const minMaxSaturation = [80, 80]
 const minMaxLightness = [50, 50]
 
+const inside = document.getElementById("inside")
+const rendered = document.getElementById("rendered")
+
 for(let i = 0; i < nPoints; i++){
     // const hue = Math.round(Math.random() * (minMaxHue[1] - minMaxHue[0]) + minMaxHue[0])
     const hue = 365 / nPoints * i
@@ -31,7 +34,7 @@ for(let i = 0; i < nPoints; i++){
     const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
     points.push({
         // x: Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0],
-        x: canvasWidth / nPoints * i,
+        x: canvasWidth / nPoints * i - canvasWidth,
         // y: Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0],
         y: 0,
         // r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
@@ -39,7 +42,7 @@ for(let i = 0; i < nPoints; i++){
         // m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
         m: 2000,
         // speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
-        speedX: 5,
+        speedX: 6,
         // speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
         speedY: 0,
         framesOutside: 0,
@@ -115,13 +118,13 @@ function update(){
     for(let i = 0; i < points.length; i++){
         const point = points[i]
         onewayGravitationalAcceleration(point)
-        // if(isOutside(point)){
-        //     if(point.framesOutside > maxFramesOutside){
-        //         points.splice(i, 1)
-        //     }
-        // } else {
-        //     pointsOnScreen++
-        // }
+        if(isOutside(point)){
+            if(point.framesOutside > maxFramesOutside){
+                points.splice(i, 1)
+            }
+        } else {
+            pointsOnScreen++
+        }
     }
     let collided = false
     // for(let i = 0; i < points.length-1; i++){
@@ -130,7 +133,8 @@ function update(){
     //         if(res) collided = true
     //     }
     // }
-    canvasContainer.style.outlineColor = collided ? "red" : "cyan"
+    rendered.innerHTML = points.length
+    inside.innerHTML = pointsOnScreen
     
 } 
 
