@@ -2,45 +2,19 @@
 
 const canvasWidth = 1000
 const canvasHeight = canvasWidth
-// const orbitingPoint1 = {
-//     x: canvasWidth * 1/3,
-//     y: canvasHeight / 2,
-//     m: 1
-// }
-// const orbitingPoint2 = {
-//     x: canvasWidth * 2/3,
-//     y: canvasHeight / 2,
-//     m: 1
-// }
 const orbitingPoint1 = {
-    x: 50,
-    y: 50,
+    x: canvasWidth * 1/4,
+    y: canvasHeight / 2,
     m: 1
 }
 const orbitingPoint2 = {
-    x: canvasWidth - 50,
-    y: 50,
-    m: 1
-}
-const orbitingPoint3 = {
-    x: 50,
-    y: canvasHeight - 50,
-    m: 1
-}
-const orbitingPoint4 = {
-    x: canvasWidth - 50,
-    y: canvasHeight - 50,
-    m: 1
-}
-const orbitingPoint5 = {
-    x: canvasWidth / 2,
+    x: canvasWidth * 3/4,
     y: canvasHeight / 2,
     m: 1
 }
 
 
-
-const orbitingPoints = [orbitingPoint1, orbitingPoint2, orbitingPoint3, orbitingPoint4, orbitingPoint5]
+const orbitingPoints = [orbitingPoint1, orbitingPoint2]
 
 const g = 5000
 const points =[]
