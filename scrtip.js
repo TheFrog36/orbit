@@ -2,63 +2,97 @@
 
 const canvasWidth = 1000
 const canvasHeight = canvasWidth
-const orbitingPoint = {
-    x: canvasWidth / 2,
+const orbitingPoint1 = {
+    x: canvasWidth * 1/3,
     y: canvasHeight / 2,
     m: 1
 }
-const g = 20000
-const points =[]
-const nPoints = 1000
-const maxSecondsOutside = 100
+const orbitingPoint2 = {
+    x: canvasWidth * 2/3,
+    y: canvasHeight / 2,
+    m: 1
+}
 
+
+
+const orbitingPoints = [orbitingPoint1, orbitingPoint2]
+
+const g = 5000
+const points =[]
+const nPoints = 100
+const maxSecondsOutside = 10
+const minStabilitySeconds = 30
+let stable = 0
 const minMaxRadius = [5,30]
 const minMaxX = [0, canvasWidth]
 const minMaxY = [0, canvasHeight]
-const minMaxSpeedX = [-10, 10]
-const minMaxSpeedY = [-10, 10]
+const minMaxSpeedX = [-4, 4]
+const minMaxSpeedY = [-4, 4]
 const minMaxMass = [1, 1]
+const minMaxG = [500, 2000]
 
-const minMaxHue = [0, 365]
-const minMaxSaturation = [60, 80]
-const minMaxLightness = [45, 60]
+const minMaxHue = [230, 250]
+const minMaxSaturation = [70, 100]
+const minMaxLightness = [40, 60]
 
 const inside = document.getElementById("inside")
 const rendered = document.getElementById("rendered")
+const stability = document.getElementById("stability")
+const stableOnScreen = document.getElementById('stable-on-screen')
+const mostStable = document.getElementById("most-stable")
+
+let countMostStable = 0
 
 for(let i = 0; i < nPoints; i++){
-    // const hue = Math.round(Math.random() * (minMaxHue[1] - minMaxHue[0]) + minMaxHue[0])
-    // const saturation = Math.round(Math.random() * (minMaxSaturation[1] - minMaxSaturation[0]) + minMaxSaturation[0])
-    // const lightness = Math.round(Math.random() * (minMaxLightness[1] - minMaxLightness[0]) + minMaxLightness[0])
+    points.push(generateRandomPoint())
+
+    // const hue = 180 + 100 / nPoints * i
+    // const hue = 0
+    // const saturation = 0
+    // const lightness = 100 / nPoints * i
     // const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
     // points.push({
-    //     x: Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0],
-    //     y: Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0],
-    //     r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
-    //     m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
-    //     speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
-    //     speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
+    //     x: canvasWidth / nPoints * i,
+    //     y: 0 ,
+    //     // r: 30 / nPoints * i,
+    //     r: 10,
+    //     m: 1 ,
+    //     speedX: 2,
+    //     speedY: 0,
     //     framesOutside: 0,
-    //     color: hueString
+    //     color: hueString,
+    //     g: 2000
     // })
+}  
 
-    const hue = 180 + 100 / nPoints * i
-    const saturation = 50
-    const lightness = 50
+function generateRandomPoint(){
+    const hue = Math.round(Math.random() * (minMaxHue[1] - minMaxHue[0]) + minMaxHue[0])
+    const saturation = Math.round(Math.random() * (minMaxSaturation[1] - minMaxSaturation[0]) + minMaxSaturation[0])
+    const lightness = Math.round(Math.random() * (minMaxLightness[1] - minMaxLightness[0]) + minMaxLightness[0])
     const hueString = `hsl(${hue}, ${saturation}%, ${lightness}%)`
-    points.push({
-        x: 300 / nPoints * i,
-        y: 0,
-        // r: 30 / nPoints * i,
-        r: 5,
-        m: 1 ,
-        speedX: 4 + 1 / nPoints * i,
-        speedY: 0,
+    const xOrY = Math.random() > 0.5? true : false
+    let x, y
+    if(xOrY){
+        x = Math.random() > 0.5 ? - 60 : canvasWidth + 60
+        y = Math.random() * (minMaxY[1] - minMaxY[0]) + minMaxY[0]
+    } else {
+        x = Math.random() * (minMaxX[1] - minMaxX[0]) + minMaxX[0]
+        y = Math.random() > 0.5 ? - 60 : canvasHeight + 60
+    }
+    return {
+        x,
+        y,
+        r: Math.floor(Math.random() * (minMaxRadius[1] - minMaxRadius[0]) + minMaxRadius[0]),
+        m: Math.random() * (minMaxMass[1] - minMaxMass[0]) + minMaxMass[0],
+        speedX: Math.random() * (minMaxSpeedX[1] - minMaxSpeedX[0]) + minMaxSpeedX[0],
+        speedY: Math.random() * (minMaxSpeedY[1] - minMaxSpeedY[0]) + minMaxSpeedY[0],
         framesOutside: 0,
         color: hueString,
-        g: 40000 / nPoints * i + 20000
-    })
-}  
+        g: Math.random() * (minMaxG[1] - minMaxG[0]) + minMaxG[0],
+        stability: 0,
+        isStable: false
+    }
+}
 
 
 const canvas = document.getElementById("canvas")
@@ -69,8 +103,10 @@ ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
 ctx.fillStyle="white"
-    ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
-
+// ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
+    for(const orbP of orbitingPoints){
+        ctx.fillRect(orbP.x, orbP.y, 3, 3);
+    }
 
 var fps = 60,
     start = Date.now(),
@@ -103,15 +139,26 @@ function gameLoop() {
 function render(lagOffset) {
     // ctx.fillStyle="black"
     // ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    // ctx.fillStyle="white"
-    // ctx.fillRect(orbitingPoint.x, orbitingPoint.y, 1, 1);
+    ctx.fillStyle="white"
+    for(const orbP of orbitingPoints){
+        ctx.fillRect(orbP.x, orbP.y, 1, 1);
+    }
+
     for(let i = 0; i < points.length; i++){
         const point = points[points.length - 1 - i]
+        
+        if(point.isStable && point.stability != countMostStable){
+            ctx.beginPath()
+            ctx.fillStyle = "red"
+            ctx.arc(point.x, point.y, point.r + 2, 0, 360)
+            ctx.fill();
+            ctx.closePath()
+        }
         ctx.beginPath()
-        ctx.fillStyle=point.color
+
+        ctx.fillStyle= point.stability == countMostStable && point.isStable ? "cyan" : point.color
         ctx.arc(point.x, point.y, point.r, 0, 360)
         ctx.fill();
-        ctx.fillRect(point.x, point.y, 2, 2)
         ctx.closePath()
     }
     // sprites.forEach(function(sprite){
@@ -128,16 +175,35 @@ function update(){
     const canvasContainer = document.getElementById("canvas-container")
     // subject.x++
     let pointsOnScreen = 0
+    let countMostStableTemp = 0
+    let countStableOnScreen = 0
     for(let i = 0; i < points.length; i++){
         const point = points[i]
-        onewayGravitationalAcceleration(point)
+        point.stability++
+        if(point.stability > countMostStableTemp) {
+            countMostStableTemp = point.stability
+        }
+        if(!point.isStable && point.stability > minStabilitySeconds * fps) {
+            stable++
+            point.isStable = true
+        }
+        for(const orbP of orbitingPoints){
+            onewayGravitationalAcceleration(point, orbP)
+        }
         if(isOutside(point)){
             if(point.framesOutside > maxFramesOutside){
                 points.splice(i, 1)
+                if(point.isStable)
+                    stable--
             }
         } else {
             pointsOnScreen++
+            if(point.isStable) countStableOnScreen++
         }
+    }
+    for(let i = 0; i < nPoints - points.length; i++){
+        points.push(generateRandomPoint())
+        pointsOnScreen++
     }
     let collided = false
     // for(let i = 0; i < points.length-1; i++){
@@ -146,13 +212,16 @@ function update(){
     //         if(res) collided = true
     //     }
     // }
+    mostStable.innerHTML = countMostStableTemp
+    stableOnScreen.innerHTML = countStableOnScreen
+    stability.innerHTML = stable
     rendered.innerHTML = points.length
     inside.innerHTML = pointsOnScreen
-    
+    countMostStable = countMostStableTemp
 } 
 
 function isOutside(point){
-    const outside = point.x < 0 || point.x > canvasWidth || point.y < 0 || point.x > canvasHeight
+    const outside = point.x < 0 || point.x > canvasWidth || point.y < 0 || point.y > canvasHeight
     if(!outside) {
         point.framesOutside = 0
         return false
@@ -161,7 +230,7 @@ function isOutside(point){
     return true
 }
 
-function onewayGravitationalAcceleration(planet){
+function onewayGravitationalAcceleration(planet, orbitingPoint){
     const distance = Math.sqrt((planet.x - orbitingPoint.x)**2 + (planet.y - orbitingPoint.y)**2)
     const force = planet.g * ((planet.m * orbitingPoint.m) / (distance ** 2))
     const angle = Math.atan2( orbitingPoint.y - planet.y, orbitingPoint.x - planet.x )

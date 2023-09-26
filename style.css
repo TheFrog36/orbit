@@ -19,7 +19,6 @@ html, body{
 #canvas-container{
     width: 100%;
     height: 100%;
-    outline: 1px solid hsl(180, 100%, 50%);
 }
 
 #canvas{
@@ -31,4 +30,23 @@ html, body{
     position: absolute;
     top: 0;
     right: 0;
+}
+
+#stability{
+    /* offset-x | offset-y | blur-radius | color */
+    text-decoration: underline red;
+    color: rgb(50, 143, 255);
+}
+
+td{
+    min-width: 40px;
+}
+
+table{
+    color: white;
+    text-align: right;
+}
+
+#most-stable{
+    color: cyan
 }
