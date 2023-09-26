@@ -30,9 +30,9 @@ const minMaxSpeedY = [-4, 4]
 const minMaxMass = [1, 1]
 const minMaxG = [500, 2000]
 
-const minMaxHue = [230, 250]
-const minMaxSaturation = [70, 100]
-const minMaxLightness = [40, 60]
+const minMaxHue = [0, 0]
+const minMaxSaturation = [0, 0]
+const minMaxLightness = [5, 15]
 
 const inside = document.getElementById("inside")
 const rendered = document.getElementById("rendered")
@@ -138,7 +138,7 @@ function gameLoop() {
 function render(lagOffset) {
     // ctx.fillStyle="black"
     // ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle="white"
+    ctx.fillStyle="red"
     for(const orbP of orbitingPoints){
         ctx.fillRect(orbP.x, orbP.y, 1, 1);
     }
@@ -148,14 +148,14 @@ function render(lagOffset) {
         
         if(point.isStable && point.stability != countMostStable){
             ctx.beginPath()
-            ctx.fillStyle = "red"
+            ctx.fillStyle = "white"
             ctx.arc(point.x, point.y, point.r + 2, 0, 360)
             ctx.fill();
             ctx.closePath()
         }
         ctx.beginPath()
 
-        ctx.fillStyle= point.stability == countMostStable && point.isStable ? "cyan" : point.color
+        ctx.fillStyle= point.stability == countMostStable && point.isStable ? "red" : point.color
         ctx.arc(point.x, point.y, point.r, 0, 360)
         ctx.fill();
         ctx.closePath()
